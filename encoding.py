@@ -1,3 +1,4 @@
+
 #This source code assumes that:
 #1) The data is clean and elements in each column of the pandas dataframe are all strings
 #2) The label is made the last column in the dataset
@@ -6,7 +7,6 @@ import pandas as pd
 import xlrd
 import numpy as np
 import tensorflow as tf
-
 
 
 def load_data(file_name):
@@ -51,20 +51,16 @@ class Encoding:
 
     else:
       print("could not recognize the extension of the file")
+      exit()
 
 
 
     self.__columns=list(self.__dataframe.columns.values)                        #getting the names of the columns in the dataset
 
-    self.__words_lists = [ [] for column in self.__columns]                     #a 2-D list where by each list will later contain the unique
-                                                                                #words in their respective coulmns. the number of empty lists
-                                                                                #is equal to the number of columns in the dataframe. The last column
-                                                                                #is taken to be the vector of labels
+    self.__words_lists=[]                                                       #a 2D-list whose elements are 1D-list representing the words in each column
 
-
-    #self.__indexes_lists= [ [0  for i in range(len(words_in_first_column))] for index in self.__columns]  #this is also a 2D list of whereby each list will be used to store
-    self.__indexes_lists =[]                                              #the indexes of each unique words obtained from the respective columns
-
+    self.__indexes_lists =[]                                                     # a 2D-list  whose elements are 1D-list representing the encode for the words in each repective column
+    self.__all_words_in_dataframe=[]
 
     self.__sc_x=0
     self.__sc_y=0
@@ -72,6 +68,7 @@ class Encoding:
     self.__ann=0
     self.__features=[]
     self.__label=[]
+
 
     self.__length_of_longest_list=0
 
@@ -89,25 +86,42 @@ class Encoding:
     e) With the help of the number of unique elements in step c, create a range of indexes and , after converting the results to array, assign them to, at a given index, in "self.__indexes_lists"
     f) convert "self.__indexes_list" to an array
 
-    This method encodes the words in the dataset so as to enable usage of the dataset in the Machine learning model
+      This method encodes the words in the dataset so as to enable usage of the dataset in the Machine learning model
 
     """
 
+
+    #taking a record of all words in the dataframe
     for index, column_name in enumerate(self.__columns):
 
+          self.__dataframe[column_name] = self.__dataframe[column_name].fillna(0)                     #fill empty spaces with zero
 
-                  self.__dataframe[column_name] = self.__dataframe[column_name].fillna(0)                 #filling up empty cells with zero
+          column_i_words_list = self.__dataframe[column_name]                                         #get the words in each column
+          #column_i_words_list = [ word.lower() for word in column_i_words_list]                       #converting the words to lower case
 
-                  words_list=list(self.__dataframe[column_name])
-                  self.__words_lists[index]= words_list                                                   #an recording them in row "i" in self.__words_lists
+          self.__words_lists.append(column_i_words_list)                                              # take a record of such list of words
 
-                  number_of_words_in_column_i = len(words_list)                                    #encoding  the words in column "i" and assiging it to row "i" in self.__indexes_lists
-                  self.__indexes_lists. append(list(range(1,number_of_words_in_column_i+1)))      # the words are encoded starting from 1.
+          var =[ self.__all_words_in_dataframe.append(i) for i in column_i_words_list]                       #append each words in column_i to "all_words_in_dataframe"
+          del var
 
+    self.__all_words_in_dataframe = list(set(self.__all_words_in_dataframe))                                          #ensuring that their is no word repetition
+
+    
+
+
+    #encoding the words in the datafarame. A word is made to have a particular code number irrespective of its location in the dataframe
+    for column_name in  self.__columns:
+
+            column_i_words_list = self.__dataframe[column_name]
+
+            words_encode = list(map(lambda x: self.__all_words_in_dataframe.index(x)   , column_i_words_list))               #find the index of each word in "column_i_words_list" and result is a list
+
+            self.__indexes_lists.append(words_encode)
 
 
 
     self.__indexes_lists = np.array(self.__indexes_lists)                       #converting the lists to array make suitable for ML models
+    self.__indexes_lists=self.__indexes_lists.transpose()
     self.__words_lists = np.array(self.__words_lists)
 
 
@@ -115,8 +129,7 @@ class Encoding:
     #we need to reverse "self.__indexes_lists"  and "self.__words_lists" to a structure
     #that is same as the original dataframe. This is achieved by transposing
     self.__words_lists = self.__words_lists.transpose()
-    self.__indexes_lists = self.__indexes_lists.transpose()
-
+  
 
   def train_model(self):
 
@@ -169,32 +182,8 @@ class Encoding:
       #step 2: Training the model
       size_of_data_per_training= len(self.__indexes_lists)//4
 
-      self.__ann.fit(self.__x_train,self.__y_train, batch_size= size_of_data_per_training,epochs=200)
+      self.__ann.fit(self.__x_train,self.__y_train, batch_size= size_of_data_per_training,epochs=400)
 
-
-  def predict(self):
-
-      y_test_predicted = self.__ann.predict(self.__x_test)
-
-      #on getting the predicted labels, we have to inverse-transform them
-
-      y_test_predicted = self.__sc_y.inverse_transform(y_test_predicted)
-
-      predicted_words=[]
-
-      # loop through the predicted y values, then find their index position in "self.__label"
-      # then utilize that index position in getting the predicted words in "self.__words_lists"
-
-      for y_predicted in y_test_predicted:
-
-              y_predicted_index = self.__label.index(y_predicted)
-
-              last_column_in_words_lists = self.__words_lists[:,-1]
-              predicted_word = last_column_in_words_lists[y_predicted_index]
-
-              predicted_words.append(predicted_word)
-
-      print(predicted_words)
 
 
   def complete_the_sentence(self, sentence):
@@ -221,24 +210,16 @@ class Encoding:
 
 
 
-    # getting the index position of each word.
-    # Assumption: thw words are searched index-wise in the fields in "self.__dataset".i.e the first word is search in first column,
-    #second word searched in second column and so on.
+   #getting the encode value of the words.  If the word isn't present in the dataframe, it is assigned a value of zero
 
-    for index,word in enumerate(list_of_words):
+    for word in list_of_words:
 
-          column_i_where_word_is_to_be_searched = self.__words_lists[:,index].tolist()
-          encode_list_for_column_i = self.__indexes_lists[:,index].tolist()
+          if word in self.__all_words_in_dataframe:
 
-          if word in column_i_where_word_is_to_be_searched:
-
-                   word_index = column_i_where_word_is_to_be_searched.index(word)
-
-                   encode_value_for_word = encode_list_for_column_i[word_index]                               #search for the encode value allocated to that word in column "i"
-                   encode_for_entire_sentence_1_D.append(encode_value_for_word)
-
+                 word_index = self.__all_words_in_dataframe.index(word)
+                 encode_for_entire_sentence_1_D.append(word_index)
           else:
-                encode_for_entire_sentence_1_D.append(0)                                                    #as the size of the data increase, the probability of
+              encode_for_entire_sentence_1_D.append(0)
                                                                                                             # appending zero , as a result of absence of the word in the searched column, will decrease
 
       #after working on all words in the sentence, we need to utilize the encode as a 2D-array
@@ -251,22 +232,23 @@ class Encoding:
     predicted_completing_label = self.__ann.predict(scaled_encoded_sentence)            #where predicted completing sentence is the predicted label for the incomplete sentence
 
 
-    predicted_completing_label = predicted_completing_label.reshape(-1,1)
+  # predicted_completing_label = predicted_completing_label.reshape(-1,1)
 
     predicted_completing_label = self.__sc_y.inverse_transform(predicted_completing_label)
 
+    
     predicted_encode = predicted_completing_label[0][0]
+
+
     predicted_encode = round(predicted_encode)                                  #round-up the predicted encode to the nearest whole number
-    #find the index position of the predicted label in "self.__label"
-    label = self.__label.tolist()
-    predicted_completing_label_index = label.index(predicted_encode)
+
+    #searching for the word that corresponds to the index position "predicted_encode" in "self.__all_words_in_dataframe"
+
+    predicted_word = self.__all_words_in_dataframe[predicted_encode]
+
+    print(f"{sentence} {predicted_word}")
 
 
-    target_column = self.__words_lists[:,-1]
-
-    predicted_completing_word= target_column[predicted_completing_label_index]
-
-    print(f"{sentence} {predicted_completing_word}")
 
 
 
