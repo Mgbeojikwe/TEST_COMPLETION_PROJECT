@@ -51,6 +51,7 @@ class Encoding:
 
     else:
       print("could not recognize the extension of the file")
+      exit()
 
 
 
