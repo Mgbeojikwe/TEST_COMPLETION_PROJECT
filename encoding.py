@@ -75,19 +75,7 @@ class Encoding:
 
   def encoder(self):
     """
-    This method is used in encoding the entire pandas dataframe i.e (features and label).
-
-
-    this method does the following:
-    a) iterate through the columns in the dataset
-    b) fill empty cells in column "i" with zeros
-    c) get the words(including zeros) in columns "i"
-    d) assign the result of step c (the words in column_i) to the list at same index in in "self.__words_lists".
-    e) With the help of the number of unique elements in step c, create a range of indexes and , after converting the results to array, assign them to, at a given index, in "self.__indexes_lists"
-    f) convert "self.__indexes_list" to an array
-
-      This method encodes the words in the dataset so as to enable usage of the dataset in the Machine learning model
-
+      this method encodes the dataset and result assigned to "self.__indexes_lists"; each word are encoded using an integer
     """
 
 
