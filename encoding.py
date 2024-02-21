@@ -121,10 +121,10 @@ class Encoding:
 
 
     self.__indexes_lists = np.array(self.__indexes_lists)                       #converting the lists to array make suitable for ML models
-    print(self.__indexes_lists)
+    
     self.__indexes_lists=self.__indexes_lists.transpose()
     self.__words_lists = np.array(self.__words_lists)
-    print(self.__indexes_lists)
+   
 
     #since the words, and hence the resulting encodings, of a column were transformed to rows,
     #we need to reverse "self.__indexes_lists"  and "self.__words_lists" to a structure
@@ -238,8 +238,6 @@ class Encoding:
     predicted_completing_label = self.__sc_y.inverse_transform(predicted_completing_label)
 
     predicted_encode = predicted_completing_label[0][0]
-
-    print(f"predicted_encode{predicted_encode}")
     
     predicted_encode = round(predicted_encode)                                  #round-up the predicted encode to the nearest whole number
 
@@ -257,7 +255,7 @@ class Encoding:
         predicted_word = self.__all_words_in_dataframe[predicted_encode]    
     
     #predicting the complete sentence
-    print(predicted_encode)
+
     print(f"{sentence} {predicted_word}")
 
 
