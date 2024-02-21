@@ -1,4 +1,3 @@
-
 #This source code assumes that:
 #1) The data is clean and elements in each column of the pandas dataframe are all strings
 #2) The label is made the last column in the dataset
@@ -7,6 +6,7 @@ import pandas as pd
 import xlrd
 import numpy as np
 import tensorflow as tf
+
 
 
 def load_data(file_name):
@@ -75,7 +75,19 @@ class Encoding:
 
   def encoder(self):
     """
-      this method encodes the dataset and result assigned to "self.__indexes_lists"; each word are encoded using an integer
+    This method is used in encoding the entire pandas dataframe i.e (features and label).
+
+
+    this method does the following:
+    a) iterate through the columns in the dataset
+    b) fill empty cells in column "i" with zeros
+    c) get the words(including zeros) in columns "i"
+    d) assign the result of step c (the words in column_i) to the list at same index in in "self.__words_lists".
+    e) With the help of the number of unique elements in step c, create a range of indexes and , after converting the results to array, assign them to, at a given index, in "self.__indexes_lists"
+    f) convert "self.__indexes_list" to an array
+
+      This method encodes the words in the dataset so as to enable usage of the dataset in the Machine learning model
+
     """
 
 
@@ -94,7 +106,7 @@ class Encoding:
 
     self.__all_words_in_dataframe = list(set(self.__all_words_in_dataframe))                                          #ensuring that their is no word repetition
 
-    
+    print(self.__all_words_in_dataframe)
 
 
     #encoding the words in the datafarame. A word is made to have a particular code number irrespective of its location in the dataframe
@@ -109,9 +121,10 @@ class Encoding:
 
 
     self.__indexes_lists = np.array(self.__indexes_lists)                       #converting the lists to array make suitable for ML models
+    print(self.__indexes_lists)
     self.__indexes_lists=self.__indexes_lists.transpose()
     self.__words_lists = np.array(self.__words_lists)
-
+    print(self.__indexes_lists)
 
     #since the words, and hence the resulting encodings, of a column were transformed to rows,
     #we need to reverse "self.__indexes_lists"  and "self.__words_lists" to a structure
@@ -145,7 +158,7 @@ class Encoding:
 
       from sklearn.model_selection import train_test_split
 
-      self.__x_train, self.__x_test, self.__y_train, self.__y_test = train_test_split(self.__features, self.__label,test_size=0.2, random_state=1)
+      self.__x_train, self.__x_test, self.__y_train, self.__y_test = train_test_split(self.__features, self.__label,test_size=0.8, random_state=1)
 
       from sklearn. preprocessing import StandardScaler
 
@@ -224,20 +237,28 @@ class Encoding:
 
     predicted_completing_label = self.__sc_y.inverse_transform(predicted_completing_label)
 
-    
     predicted_encode = predicted_completing_label[0][0]
 
-
+    print(f"predicted_encode{predicted_encode}")
+    
     predicted_encode = round(predicted_encode)                                  #round-up the predicted encode to the nearest whole number
 
-    #searching for the word that corresponds to the index position "predicted_encode" in "self.__all_words_in_dataframe"
+    label =self.__indexes_lists[:,-1]
 
-    predicted_word = self.__all_words_in_dataframe[predicted_encode]
 
+    if predicted_encode in label:
+          predicted_word = self.__all_words_in_dataframe[predicted_encode]
+    else:
+
+        closest_diff = min([ abs(predicted_encode - index)  for index in label])        # getting the difference between the predicted encode and all index in label,
+                                                                                        #getting the minimum differnence
+        predicted_encode += closest_diff                                                 #altering the value of the predicted encode
+
+        predicted_word = self.__all_words_in_dataframe[predicted_encode]    
+    
+    #predicting the complete sentence
+    print(predicted_encode)
     print(f"{sentence} {predicted_word}")
-
-
-
 
 
 
