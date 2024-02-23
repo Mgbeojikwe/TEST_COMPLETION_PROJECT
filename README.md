@@ -37,4 +37,4 @@ method 2 :   train_model
 
        step 3 =>  with the aid of sklearn's "sklearn.model_selection.train_test_split()" function, split the 2D-arrays obtained from step 1 and step 2  into training_set and test_set.
 
-        step 4 =>  Due to significant difference in the elements in each column, we have to standard the data using "sklearn.preprocessign.StandardScaler()" class  so we can place all elements of the data on the same scale
+        step 4 =>  Due to significant difference in the elements in each column, we have to standardize the data using "sklearn.preprocessign.StandardScaler()" class. This necessary so enable the numbers are placed on same scale and all have equal influence on the prediction.
