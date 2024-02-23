@@ -31,7 +31,7 @@ method 2 :   train_model
 
         This method trains the Neural network model. It uses the encoded dataframe "self.__indexes_lists" in training the ML  model. It acheives its aim using the following steps.
 
-        step 1 => create the features by selecting the first row to a penultimate row and assigning the resulting to "self.__features"
+        step 1 => create the features by selecting the first column to a penultimate column and assigning the resulting to "self.__features"
 
        step 2 =>  create the label by selecting the last column in "self.__indexes_list" and assign the resulting to "self.__label"
 
