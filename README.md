@@ -5,7 +5,9 @@ To overcome these drawbacks, I created a new derived class: Encoding; "Encoding(
 
 method 1 :  encoder
 
-        Since a typical Machine learing model requires that its trainging data are numeric, this class encodes the training data so that the words in the original data are represented by integers. It acheives its objectives through the steps:
+        Since a typical Machine learing model requires that its trainging data are numeric, this class encodes the training data so that the words in the original data are represented by integers.
+        It acheives its objectives through the steps:
+        
         step 1 => iterate through the columns in the original data
 
         step 2 => for a given column "i", fill empty spaces with zeros
@@ -37,4 +39,29 @@ method 2 :   train_model
 
        step 3 =>  with the aid of sklearn's "sklearn.model_selection.train_test_split()" function, split the 2D-arrays obtained from step 1 and step 2  into training_set and test_set.
 
-        step 4 =>  Due to significant difference in the elements in each column, we have to standardize the data using "sklearn.preprocessign.StandardScaler()" class. This necessary so enable the numbers are placed on same scale and all have equal influence on the prediction.
+        step 4 =>  Due to significant difference in the elements in each column, we have to standardize the data using "sklearn.preprocessign.StandardScaler()" class. 
+                This necessary so enable the numbers are placed on same scale and all have equal influence on the prediction.
+        step 5 => the training_set data is used to train the Neural Network in batch propagation mode. The Neural network used has the properties:
+                a) two hidden layers
+                b) utilizes the Relu  activation fucntion
+                c)uses the adam optimizer
+                d) uses an epoch of 400 i.e the entire data is used to train the model 400 times.
+method 3        Complete_the_sentence
+
+                This method accepts the sentence needed to be completed, and completes the sentence with the aid of the trained Neural Network model.
+        It acheives its objective throught the following steps:
+
+        step 1 => the incomplete sentence is splitted into a list of words
+
+        step 2 => Check if the size of the list obtained in step1 equals the dimensionality of the training data, If no, append zero to the list until its size equals the dimensionality of the training data.
+
+        step 3 => encode the  words present in the list obtained in step 2. Each  word is searched in "self.__all_words_in_dataframe", if present, then they are encoded will the number used in encoding same word in the training data.
+        step 4 => convert the encoded list obtained in step 3 to a 2D-array of size 1
+
+        step 5 => feature-scale the 2D-array obtained in step 4; the arrays are scaled using the same standard deviation that was used in scaling the training features.
+
+        step 6  = > predict the encode for the label using the neural network object "self.__ann".
+
+        step 7 =>  using the encode gotten from step 7, traceback the word that has such code in "self.__all_words_in_data_frame"
+
+
