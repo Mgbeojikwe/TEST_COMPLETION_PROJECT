@@ -1,7 +1,7 @@
 # TEST_COMPLETION_PROJECT
 
-This source code's aim is to assist in completing sentences; it utilizes the Neural Network model. This source code circumvents the two challenges encountered in using the sklearn "sklearn.preprocessing.HotEncoding()" class viz: 1) creating an unusual large dataframe when encoding each column of strings; as a result of creating additional columns, and 2) the  new columns are not be utilized in training the machine learing model.
-To overcome these drawbacks, I created a new derived class: Encoding; "Encodign()" has three methods and they are discussed below. The latest structure of the class is found in encoding.py
+This source code's aim is to assist in completing sentences; it utilizes the Neural Network model. sklearn "sklearn.preprocessing.HotEncoding()" class has two major drawbacks viz: 1) creating an unusual large dataframe when encoding each column of strings; as a result of creating additional columns, and 2) the  new columns are not be utilized in training the machine learing model.
+To overcome these drawbacks, I created a new derived class: Encoding; "Encoding()" has three methods and they are discussed below. The latest structure of the class is found in encoding.py
 
 method 1 :  encoder
 
